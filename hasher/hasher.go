@@ -1,15 +1,13 @@
-package main
-
-import "fmt"
+package hasher
 
 type Hasher interface {
 	/* */
-	getHash(data []uint8) []uint8
+	GetHash(data []uint8) []uint8
 
 	/**/
-	getHashSize() uint32
+	GetHashSize() uint32
 	/**/
-	reset()
+	Reset()
 }
 
 /******************** MD5 **********************/
@@ -73,7 +71,7 @@ func II(a *uint32, b uint32, c uint32, d uint32, x uint32, s uint8, ac uint32) {
 
 func encode(input []uint32) []uint8 {
 	output := make([]uint8, len(input) * 4)
-	for i, j := 0, 0; j < len(input); i, j = i + 1, j + 4 {
+	for i, j := 0, 0; j < len(output); i, j = i + 1, j + 4 {
 		output[j] = uint8(input[i] & 0xff)
 		output[j+1] = uint8((input[i] >> 8) & 0xff)
 		output[j+2] = uint8((input[i] >> 16) & 0xff)
@@ -92,7 +90,7 @@ func decode(input []uint8) []uint32 {
 }
 
 /* MD5 basic transformation. Transforms state based on block */
-func (hasher MD5Hasher) transformMD5(block []uint8) {
+func (hasher *MD5Hasher) transformMD5(block []uint8) {
 	var a,b,c,d = hasher.state[0], hasher.state[1], hasher.state[2], hasher.state[3]
 	var x = decode(block[:])
 
@@ -168,16 +166,13 @@ func (hasher MD5Hasher) transformMD5(block []uint8) {
 	II(&c, d, a, b, x[ 2], S43, 0x2ad7d2bb) /* 63 */
 	II(&b, c, d, a, x[ 9], S44, 0xeb86d391) /* 64 */
 
-	fmt.Printf("%v\n", hasher.state)
-
-
 	hasher.state[0] += a
 	hasher.state[1] += b
 	hasher.state[2] += c
 	hasher.state[3] += d
 }
 
-func (hasher MD5Hasher) updateMD5(data []uint8) {
+func (hasher *MD5Hasher) updateMD5(data []uint8) {
 	var i, index, partLen uint32
 	inputLen := uint32(len(data))
 
@@ -205,18 +200,11 @@ func (hasher MD5Hasher) updateMD5(data []uint8) {
 		i = 0
 	}
 
-	//var ptr = (*[]uint8)(unsafe.Pointer(&hasher.buffer[index]))
-	//
-	///* Buffer remaining input */
-	//copy(*ptr, data.data[i:])
 	/* Buffer remaining input */
 	copy(hasher.buffer[index:], data[i:])
-	fmt.Printf("%v\n", hasher.buffer)
-	fmt.Printf("%v\n", hasher.count)
-
 }
 
-func (hasher MD5Hasher) finalMD5() [HASH_SIZE_MD5]uint8 {
+func (hasher *MD5Hasher) finalMD5() [HASH_SIZE_MD5]uint8 {
 	var index, padLen uint32
 	var digest [16]uint8
 	bits := encode(hasher.count[0:2])
@@ -231,13 +219,12 @@ func (hasher MD5Hasher) finalMD5() [HASH_SIZE_MD5]uint8 {
 
 	/* Append length (before padding) */
 	hasher.updateMD5(bits[0:8])
-	fmt.Printf("%v\n", hasher.state)
 
 	copy(digest[:], encode(hasher.state[0:4]))
 	return digest
 }
 
-func (hasher MD5Hasher) reset() {
+func (hasher *MD5Hasher) Reset() {
 	hasher.state[0] = 0x67452301
 	hasher.state[1] = 0xefcdab89
 	hasher.state[2] = 0x98badcfe
@@ -246,18 +233,20 @@ func (hasher MD5Hasher) reset() {
 	hasher.count[1] = 0
 }
 
-func (hasher MD5Hasher) getHash(data []uint8) []uint8 {
+func (hasher *MD5Hasher) GetHash(data []uint8) []uint8 {
 	hasher.updateMD5(data)
 	digest := hasher.finalMD5()
 
-	hasher.reset()
+	hasher.Reset()
 	return digest[:]
 }
 
-func (hasher MD5Hasher) getHashSize() uint32 {
+func (hasher MD5Hasher) GetHashSize() uint32 {
 	return HASH_SIZE_MD5
 }
 
-func createMD5Hasher() Hasher {
-	return &MD5Hasher{ }
+func CreateMD5Hasher() Hasher {
+	hasher := MD5Hasher{}
+	hasher.Reset()
+	return &hasher
 }
