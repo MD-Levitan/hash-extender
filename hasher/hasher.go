@@ -35,6 +35,7 @@ func Encode(input []uint32) []uint8 {
 	return output
 }
 
+
 func Decode(input []uint8) []uint32 {
 	output := make([]uint32, len(input) / 4)
 	for i, j := 0, 0; j < len(input); i, j = i + 1, j + 4 {
@@ -42,6 +43,17 @@ func Decode(input []uint8) []uint32 {
 			(uint32(input[j+1]) << 8) |
 			(uint32(input[j+2]) << 16) |
 			(uint32(input[j+3]) << 24)
+	}
+	return output
+}
+
+func Decode2(input []uint8) []uint32 {
+	output := make([]uint32, len(input) / 4)
+	for i, j := 0, 0; j < len(input); i, j = i + 1, j + 4 {
+		output[i] = (uint32(input[j+3]) << 00) |
+			(uint32(input[j+2]) << 8) |
+			(uint32(input[j+1]) << 16) |
+			(uint32(input[j+0]) << 24)
 	}
 	return output
 }

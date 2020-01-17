@@ -188,7 +188,7 @@ func (hasher *SHA1Hasher) Update(data []uint8) {
 func (hasher *SHA1Hasher) Final() []uint8 {
 	var digest [HASH_SIZE_SHA1]uint8
 	var finalCount = make([]uint8, 8)
-	var c = [...]uint8{0200,}
+	var c = [...]uint8{0x80,}
 
 	for i := 0; i < 8; i++  {
 		j := 1
@@ -203,7 +203,6 @@ func (hasher *SHA1Hasher) Final() []uint8 {
 		hasher.Update(c[:])
 	}
 	hasher.Update(finalCount)
-
 	for i := 0; i < 20; i++ {
 		digest[i] = uint8(hasher.state[i >> 2] >> ((3-(i & 3)) * 8)) & 255
 	}

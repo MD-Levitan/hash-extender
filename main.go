@@ -20,9 +20,14 @@ func main() {
 
 	p := extender.CreateExtenderMD5(hasher.CreateMD5Hasher())
 	sign, _ := hex.DecodeString("4ff221af0ac2878285ec9b931cb67c02")
-	_, res := p.GenerateExtension([]byte("count=10&lat=37.351&user_id=1&long=-119.827&waffle=eggo"), sign, []byte("&waffle=liege"), 14)
-	fmt.Printf("res: %v \n", res)
-	fmt.Printf("res: %v \n", string(res))
+	sign_new, res := p.GenerateExtension([]byte("count=10&lat=37.351&user_id=1&long=-119.827&waffle=eggo"), sign, []byte("&waffle=liege"), 14)
+	fmt.Printf("res: %v \n", hex.EncodeToString(sign_new))
+	fmt.Printf("res: %v \n", hex.EncodeToString(res))
+
+	message := []byte("12345678901234")
+	message = append(message, res...)
+	digest = v.GetHash(message)
+	fmt.Printf("Dig: %s\n", hex.EncodeToString(digest))
 
 
 }

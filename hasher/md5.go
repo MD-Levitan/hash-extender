@@ -63,7 +63,6 @@ func ii(a *uint32, b uint32, c uint32, d uint32, x uint32, s uint8, ac uint32) {
 func (hasher *MD5Hasher) Transform(block []uint8) {
 	var a,b,c,d = hasher.state[0], hasher.state[1], hasher.state[2], hasher.state[3]
 	var x = Decode(block[:64])
-
 	/* Round 1 */
 	ff(&a, b, c, d, x[ 0], S11, 0xd76aa478) /* 1 */
 	ff(&d, a, b, c, x[ 1], S12, 0xe8c7b756) /* 2 */
@@ -169,7 +168,7 @@ func (hasher *MD5Hasher) Update(data []uint8) {
 	if inputLen >= partLen {
 		copy(hasher.buffer[index:], data[0:partLen])
 		hasher.Transform(hasher.buffer[:])
-		for i:=partLen; i + 63 < inputLen; i += 64 {
+		for i = partLen; i + 63 < inputLen; i += 64 {
 			hasher.Transform(data[i:])
 		}
 		index = 0
@@ -230,13 +229,13 @@ func (hasher MD5Hasher) PrintStatus() {
 
 }
 
-func CreateMD5Hasher() MD5Hasher {
+func CreateMD5HasherPrivate() MD5Hasher {
 	hasher := MD5Hasher{}
 	hasher.Reset()
 	return hasher
 }
 
-func CreateHasher() Hasher {
+func CreateMD5Hasher() Hasher {
 	hasher := MD5Hasher{}
 	hasher.Reset()
 	return &hasher
