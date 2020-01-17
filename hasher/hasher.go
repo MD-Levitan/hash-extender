@@ -1,5 +1,7 @@
 package hasher
 
+import "fmt"
+
 type Hasher interface {
 	/* */
 	GetHash([]uint8) []uint8
@@ -97,8 +99,8 @@ func Encode(input []uint32) []uint8 {
 func Decode(input []uint8) []uint32 {
 	output := make([]uint32, len(input) / 4)
 	for i, j := 0, 0; j < len(input); i, j = i + 1, j + 4 {
-		output[i] = uint32(input[j]) | (uint32(input[j+1]) << 8) |
-					  (uint32(input[j+2]) << 16) | (uint32(input[j+3]) << 24)
+		output[i] = (uint32(input[j+0]) << 00) | (uint32(input[j+1]) << 8) |
+					(uint32(input[j+2]) << 16) | (uint32(input[j+3]) << 24)
 	}
 	return output
 }
@@ -106,7 +108,7 @@ func Decode(input []uint8) []uint32 {
 /* MD5 basic transformation. Transforms state based on block */
 func (hasher *MD5Hasher) Transform(block []uint8) {
 	var a,b,c,d = hasher.state[0], hasher.state[1], hasher.state[2], hasher.state[3]
-	var x = Decode(block[:])
+	var x = Decode(block[:64])
 
 	/* Round 1 */
 	ff(&a, b, c, d, x[ 0], S11, 0xd76aa478) /* 1 */
@@ -264,6 +266,13 @@ func (hasher MD5Hasher) GetHashSize() uint32 {
 	return HASH_SIZE_MD5
 }
 
+func (hasher MD5Hasher) PrintStatus() {
+	fmt.Printf("Hasher:\n")
+	fmt.Printf("state: %v\n", hasher.state)
+	fmt.Printf("count: %v\n", hasher.count)
+	fmt.Printf("buffer: %v\n", hasher.buffer)
+
+}
 
 func CreateMD5Hasher() MD5Hasher {
 	hasher := MD5Hasher{}
