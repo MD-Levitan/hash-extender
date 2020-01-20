@@ -61,3 +61,51 @@ func TestMD5Bytes2(t *testing.T) {
 			hexBytes, "27fd6842da77a8c92c9804277f5cf3f4")
 	}
 }
+
+func TestTiger(t *testing.T){
+	var a, b, c uint64 = 6280199717849618378, 8343645101657805456, 5997044206234503415
+	var x = [...]uint64 {12062177936022666431, 11490956213547313652, 16829172008830410301,
+		11899344311637024046,  3757253942274655973, 17835857420906997132,
+		10787740079658512390,  17590610739856314589}
+	//var mul uint8 = 9
+	//round(&a, &b, &c, x[0], mul)
+	//round(&b, &c, &a, x[1], mul)
+	//round(&c, &a, &b, x[2], mul)
+	//round(&a, &b, &c, x[3], mul)
+	//round(&b, &c, &a, x[4], mul)
+	//round(&c, &a, &b, x[5], mul)
+	//round(&a, &b, &c, x[6], mul)
+	//round(&b, &c, &a, x[7], mul)
+	pass(&a, &b, &c, x[:], 9)
+	if a != 1509595445172618351 {
+		t.Errorf("value a is incorrect (caclulated %d, real %d)", a, 1509595445172618351)
+	}
+
+
+	if b != 206383248218352883 {
+		t.Errorf("value b is incorrect (caclulated %d, real %d)", b, 206383248218352883)
+	}
+
+
+	if c != 2725617220977123037 {
+		t.Errorf("value c is incorrect (caclulated %d, real %d)", c, 2725617220977123037)
+	}
+
+}
+
+func TestTigerUpdate(t *testing.T) {
+	var hasher = CreateTigerHasherPrivate()
+	var data = []byte("TigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTige")
+	var state = [...]uint64{81985529216486895, 18364758544493064720, 17336226011405279623}
+	hasher.ChangeStatus(state[:], make([]uint32, 2))
+	hasher.Transform(data)
+	if hasher.state[0] != 0x29CCDEE812891C0F {
+		t.Errorf("Update work wrong")
+	}
+	if hasher.state[1] != 0xA18BA64634ACD11A {
+		t.Errorf("Update work wrong")
+	}
+	if hasher.state[2] != 0x5FA4D4854FCE7BCA {
+		t.Errorf("Update work wrong")
+	}
+}
