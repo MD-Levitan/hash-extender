@@ -290,6 +290,8 @@ func round(a *uint64, b *uint64, c *uint64, x uint64, mul uint8){
 	*b *= uint64(mul)
 }
 
+
+
 func keySchedule(x []uint64) {
 	x[0] -= x[7] ^ 0xa5a5a5a5a5a5a5a5
 	x[1] ^= x[0]
@@ -364,7 +366,7 @@ func (hasher *TigerHasher) Transform(block []uint8) {
 	//round(&c, &a, &b, x[4], mul)
 	//round(&a, &b, &c, x[5], mul)
 	//round(&b, &c, &a, x[6], mul)
-	//round(&a, &b, &c, x[7], mul)
+	//round(&c, &a, &b, x[7], mul)
 
 	hasher.state[0] ^= a
 	hasher.state[1] = b - hasher.state[1]
@@ -437,6 +439,10 @@ func (hasher *TigerHasher) Reset() {
 	hasher.state[2] = 0xF096A5B4C3B2E187
 	hasher.count[0] = 0
 	hasher.count[1] = 0
+}
+
+func (hasher TigerHasher) GetPad() uint8 {
+	return hasher.opad
 }
 
 func (hasher *TigerHasher) GetHash(data []uint8) []uint8 {

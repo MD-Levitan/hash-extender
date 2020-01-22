@@ -94,7 +94,7 @@ func TestTiger(t *testing.T){
 }
 
 func TestTigerUpdate(t *testing.T) {
-	var hasher = CreateTigerHasherPrivate()
+	var hasher = CreateTigerHasherPrivate(0x01)
 	var data = []byte("TigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTige")
 	var state = [...]uint64{81985529216486895, 18364758544493064720, 17336226011405279623}
 	hasher.ChangeStatus(state[:], make([]uint32, 2))
